@@ -30,9 +30,20 @@ number_of_words = size(dictionary_split,2);
 
 % what is the lenght of the words
 % if there is one word is a different length exit
-% KHI: To implement the word length check
-for n = 1: number_of_words
-    length_of_words = length(dictionary_split{n});
+
+for n = 1: number_of_words - 1
+
+    n1 = length(dictionary_split{n});
+    n2 = length(dictionary_split{n + 1});
+    
+       if ~isequal(n1,n2)
+         disp('There are words of different length')
+        return
+    end
+    % if the length of the words is the same then we need only define the
+    % length of one of the words. WLOG I've taken the first word
+    length_of_words = length(dictionary_split{1});
+    
 end
 
 
