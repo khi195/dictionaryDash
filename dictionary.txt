@@ -1,1 +1,1 @@
-'hit,dot,dog,cog,hot,log'€™
+hit,dot,dog,cog,hot,log
