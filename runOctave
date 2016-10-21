@@ -1,0 +1,6 @@
+#!/bin/bash
+
+if[ -f "results.txt" ]
+then
+	echo " filer found"
+fi
