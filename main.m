@@ -1,42 +1,37 @@
 
 
 %%-----------Start and welcome message ---------
+disp('----------------------------------')
 disp('Start the dictionary dash')
-
+disp('----------------------------------')
 %-----------Start and end words-----------------
 % 
-start_word = 'hit';
-end_word = 'cog';
 
-% create a cell containing the start and end words
-start_end_cell = {start_word, end_word};
-
-%-------String manipulation---------------------
+% read in the dictionary name and start and end words
+[dict_name, start_word, end_word] = input_var(1);
 
 %Open the file contain the list of words
-fileID = fopen('dictionary.txt','r');
+fileID = fopen(dict_name,'r');
 formatSpec = '%s';
-% 
 dictionary = fscanf(fileID,formatSpec);
+fclose(fileID);
 
-%split into array of words
-dictionary_split = strsplit(dictionary, ',');
+%check if file name exists
+if fileID <0, disp('dictionary file not found'), return, end
 
-%remove white space
-dictionary_split = strtrim(dictionary_split);
+[dictionary_split, number_of_words, start_end_test] =...
+    string_manip(dictionary, start_word, end_word);
 
-% How many words in the array?
-number_of_words = size(dictionary_split,2);
+if start_end_test ==0; return; end
 
-% what is the lenght of the words
+% what is the length of the words?
 % if there is one word is a different length exit
-
 for n = 1: number_of_words - 1
 
     n1 = length(dictionary_split{n});
     n2 = length(dictionary_split{n + 1});
     
-       if ~isequal(n1,n2)
+    if ~isequal(n1,n2)
          disp('There are words of different length')
         return
     end
@@ -46,10 +41,6 @@ for n = 1: number_of_words - 1
     
 end
 
-
-
-% The first word in the array
-dictionary_split_1 = dictionary_split{1};
 
 % the last word in the list
 dictionary_split_last = dictionary_split{number_of_words};
@@ -71,45 +62,43 @@ end
 number_of_words = length(dictionary_split);
 
 
-%which word can NEVER be the first word transformed to.
+%[array_perm, array_start, array_end] = permutation(dictionary_split, number_of_words, start_word, end_word);
 
-% convert to array of strings into a array of characters
-% KHI: Is this redundant?   
-%A = char(C);
 
 % All the permuations of the array of strings
 permutation_dictionary = perms(dictionary_split);
 
-% loop over the words and break if there isn't anything in the chain
-
- 
-
-for i = 1 : length(perms(dictionary_split)) % the number of possible permuations
+number_of_chains = 0;
+for i = 1 :length(perms(dictionary_split)) % the number of possible permuations
 current_word = start_word; % The word we want to start with
  
 
    length_index = 0;
    chain = {}; %initialise the chain array for each permuation
    chain = [chain, start_word]; % add 
-    for j = 1: number_of_words % loop over the number of words in each permuation
+   for j = 1: number_of_words % loop over the number of words in each permuation
         % check if the previous word has been transformed to the end word
         
         m = next_string(current_word, end_word);
-        
+        word_2_cell = permutation_dictionary(i,j);
+        cell_2_string = word_2_cell{1,1};
         if m == 1
            fprintf(' Transformed to the end word %s to %s \n',current_word, end_word);
            chain = [chain, end_word];
+           number_of_chains = number_of_chains + 1;
            length_index = length_index + 1;
-           output(chain, length_index );
-           return
-        end
+           %store the length of the chain
 
-        l = 0; % loop index for the  number of characters
+                   if number_of_chains == 1 || length_index<=length_of_chain
+                        output(chain, length_index, cell_2_string ); 
+                   end
+                   
+                length_of_chain = length_index;           
+        end
+        
         % check if this current string can be transfered to the next string
-        next_in_chain = permutation_dictionary(i,j);
-        word_2_cell = permutation_dictionary(i,j);
-        cell_2_string = word_2_cell{1,1};
-         q =  next_string(current_word, cell_2_string);
+        
+        q =  next_string(current_word, cell_2_string);
             
         if q == 1
             fprintf(' Word transformed from %s to %s \n',current_word, cell_2_string);
@@ -122,8 +111,12 @@ current_word = start_word; % The word we want to start with
             break
         end
              
-    end
+   end
          
+   if number_of_chains == 0 && i == length(perms(dictionary_split))
+       disp('no such chain exists for this dictionary')
+   end
+   
 end
 
 
